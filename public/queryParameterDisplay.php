@@ -18,8 +18,14 @@ $age = filter_input(INPUT_GET, "age", FILTER_VALIDATE_INT);
 <body>
     <?php if ($name && $age): ?>
         <h1><?= $name ?> is <?= $age ?> years old</h1>
-    <?php else: ?>
-        <li>missing parameter</li>
+    <?php elseif (!$name || !$age): ?>
+        <h1>No query parameters found</h1>
+        <?php if (!$name): ?>
+            <li>Missing name</li>
+        <?php endif; ?>
+        <?php if (!$age): ?>
+            <li>Missing age</li>
+        <?php endif; ?>
     <?php endif; ?>
 </body>
 
