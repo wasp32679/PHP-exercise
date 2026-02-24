@@ -10,19 +10,49 @@
  * (Your form should be semantically correct, use a label and name your fields)
  */
 
+$name = filter_input(INPUT_POST, "name", FILTER_SANITIZE_SPECIAL_CHARS, FILTER_NULL_ON_FAILURE);
+$age = filter_input(INPUT_POST, "age", FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+
 ?>
 
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Form management</title>
 </head>
-<body>
 
-<!-- WRITE YOUR HTML AND PHP TEMPLATING HERE -->
+<body>
+    <form action="formManagement.php" method="POST">
+        <label for="name">Your name :</label>
+        <input type="text" id="name" name="name" value="<?= $name ?>">
+
+        <label for="age">Your age :</label>
+        <input type="number" id="age" name="age" value="<?= $age ?>">
+
+        <button type="submit">Submit</button>
+    </form>
+
+
+    <?php if (!$_SERVER['REQUEST_METHOD'] == 'POST' || empty($name) || empty($age)): ?>
+        <h1>Submit the form</h1>
+    <?php elseif (isset($name) && isset($age) && mb_strlen($name) < 6): ?>
+        <h1><?= $name ?> is <?= $age ?> years old</h1>
+    <?php else: ?>
+        <h1><span style="color:red"><?= $name ?></span> is <?= $age ?> years old</h1>
+    <?php endif; ?>
+
+    <?php if ($age > 18): ?>
+        <ul>
+            <?php for ($i = 1; $i <= $age; $i++): ?>
+                <li><?= $i ?></li>
+            <?php endfor; ?>
+        </ul>
+    <?php endif; ?>
 </body>
+
 </html>
