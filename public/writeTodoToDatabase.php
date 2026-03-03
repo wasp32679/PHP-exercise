@@ -12,22 +12,21 @@
 
 $name = filter_input(INPUT_POST, "name", FILTER_SANITIZE_SPECIAL_CHARS, FILTER_NULL_ON_FAILURE);
 $date = filter_input(INPUT_POST, "date", FILTER_SANITIZE_SPECIAL_CHARS, FILTER_NULL_ON_FAILURE);
-var_dump($name);
-var_dump($date);
+$errors = [];
 
 $pdo = new PDO("sqlite:" . __DIR__ . "/../database.db");
-
-if (isset($name) && isset($date)) {
-    $errors = [];
-    $currentDate = date("Y-m-d");
+if ($name !== false && $date !== false) {
+    $d = DateTime::createFromFormat("Y-m-d", $date);
 
     if (trim($name) === "") {
         $errors[] = "Name can not be empty";
-    } elseif ($date < $currentDate) {
+    } elseif ($d === false) {
         $errors[] = "Invalid date";
-    } elseif (trim($name) !== "" && $date > $currentDate) {
+    } elseif (trim($name) !== "" && $d !== false) {
         $stmt = $pdo->prepare("insert into todos (title, due_date) values (?, ?)");
         $stmt->execute([$name, $date]);
+        header("Location: displayAllTodosFromDatabase.php");
+        exit();
     }
 }
 
@@ -56,8 +55,7 @@ if (isset($name) && isset($date)) {
         <input type="date" id="date" name="date">
         <button type="submit">Submit</button>
     </form>
-
-    <?php if ($errors !== []): ?>
+    <?php if (!empty($errors)): ?>
         <h2><?= $errors[0] ?></h2>
     <?php endif; ?>
 
