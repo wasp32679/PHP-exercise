@@ -10,22 +10,57 @@
  * If the user input is invalid, display an error to the user
  */
 
+$name = filter_input(INPUT_POST, "name", FILTER_SANITIZE_SPECIAL_CHARS, FILTER_NULL_ON_FAILURE);
+$date = filter_input(INPUT_POST, "date", FILTER_SANITIZE_SPECIAL_CHARS, FILTER_NULL_ON_FAILURE);
+var_dump($name);
+var_dump($date);
+
+$pdo = new PDO("sqlite:" . __DIR__ . "/../database.db");
+
+if (isset($name) && isset($date)) {
+    $errors = [];
+    $currentDate = date("Y-m-d");
+
+    if (trim($name) === "") {
+        $errors[] = "Name can not be empty";
+    } elseif ($date < $currentDate) {
+        $errors[] = "Invalid date";
+    } elseif (trim($name) !== "" && $date > $currentDate) {
+        $stmt = $pdo->prepare("insert into todos (title, due_date) values (?, ?)");
+        $stmt->execute([$name, $date]);
+    }
+}
+
 ?>
 
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Create a new todo</title>
 </head>
+
 <body>
 
-<h1>
-    Create a new todo
-</h1>
-<!-- WRITE YOUR HTML AND PHP TEMPLATING HERE -->
+    <h1>
+        Create a new todo
+    </h1>
+    <form action="writeTodoToDatabase.php" method="POST">
+        <label for="name">Name :</label>
+        <input type="text" id="name" name="name">
+        <label for="date">Date :</label>
+        <input type="date" id="date" name="date">
+        <button type="submit">Submit</button>
+    </form>
+
+    <?php if ($errors !== []): ?>
+        <h2><?= $errors[0] ?></h2>
+    <?php endif; ?>
+
 </body>
+
 </html>
