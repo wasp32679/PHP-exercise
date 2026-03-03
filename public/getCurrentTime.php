@@ -18,7 +18,7 @@ $date = date("Y-m-d H:i:s");
     <h1>
         <?=
         $date
-        ?>
+?>
     </h1>
 </body>
 
